@@ -48,8 +48,81 @@ Casablanca.
 
 Résultat :
 
-```json
+json
 {
   "status": "ok",
   "data": []
 }
+
+### Test OpenAQ au Maroc
+
+Une recherche a été effectuée dans OpenAQ Explorer pour plusieurs villes marocaines, notamment Casablanca, Rabat, Marrakech, Fès, Tanger et Ben Guerir.
+
+La couverture observée reste limitée. Des stations ont été trouvées uniquement à Marrakech et à Ben Guerir.
+
+#### Station Marrakech-Residence Mima
+
+* Ville : Marrakech
+* Nom : Marrakech-Residence Mima
+* Type : capteur d’air fixe
+* Propriétaire : campus
+* Fournisseur : AirGradient
+* Instrument : Unknown AirGradient Sensor
+* Mesures disponibles :
+
+  * PM1
+  * PM2.5
+  * PM10
+  * humidité relative
+  * température
+  * concentration de particules PM0.3
+* Fréquence de mise à jour observée : mise à jour récente, environ une heure
+* Données disponibles depuis : 17 mai 2024
+* Licence : CC BY 4.0
+
+#### Station UM6P_Bengeurir2
+
+* Ville : Ben Guerir
+* Nom : UM6P_Bengeurir2
+* Type : capteur d’air fixe
+* Propriétaire : campus
+* Fournisseur : AirGradient
+* Instrument : Unknown AirGradient Sensor
+* Mesures disponibles :
+
+  * PM1
+  * PM2.5
+  * PM10
+  * humidité relative
+  * température
+  * concentration de particules PM0.3
+* Fréquence de mise à jour observée : mise à jour récente, environ une heure
+* Données disponibles depuis : 23 octobre 2024
+* Licence : CC BY 4.0
+
+#### Station ARC Air
+
+* Ville : Ben Guerir
+* Nom : ARC Air
+* Type : capteur d’air fixe
+* Propriétaire : campus
+* Fournisseur : AirGradient
+* Instrument : AirGradient Open Air Generation 1 (O-1PST)
+* Mesures disponibles :
+
+  * PM1
+  * PM2.5
+  * humidité relative
+  * température
+  * concentration de particules PM0.3
+* Fréquence de mise à jour observée : mise à jour récente, environ une heure
+* Données disponibles depuis : 26 mars 2025
+* Licence : CC BY 4.0
+
+### Conclusion sur OpenAQ
+
+OpenAQ fournit des données récentes et exploitables pour certaines zones du Maroc. Les stations trouvées utilisent principalement des capteurs AirGradient et mesurent surtout les particules fines.
+
+Cependant, la couverture géographique reste insuffisante pour un projet visant plusieurs grandes villes marocaines. Aucune station n’a été observée à Casablanca, Rabat, Fès ou Tanger.
+
+OpenAQ peut donc être retenue comme source partielle ou secondaire, notamment pour Marrakech et Ben Guerir, mais elle ne peut pas constituer l’unique source de données du projet.
