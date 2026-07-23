@@ -1,26 +1,31 @@
 import requests
 
-url = "https://air-quality-api.open-meteo.com/v1/air-quality"
+OPEN_METEO_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
+DEFAULT_LATITUDE = 34.0132
+DEFAULT_LONGITUDE = -6.8326
+DEFAULT_TIMEZONE = "Africa/Casablanca"
 
-params = {
-    "latitude": 34.0132,
-    "longitude": -6.8326,
-    "hourly": (
-        "pm10,"
-        "pm2_5,"
-        "carbon_monoxide,"
-        "nitrogen_dioxide,"
-        "sulphur_dioxide,"
-        "ozone,"
-        "european_aqi"
-    ),
-    "timezone": "Africa/Casablanca",
-}
+def fetch_air_quality():
+    params = {
+        "latitude": DEFAULT_LATITUDE,
+        "longitude": DEFAULT_LONGITUDE,
+        "hourly": (
+            "pm10,"
+            "pm2_5,"
+            "carbon_monoxide,"
+            "nitrogen_dioxide,"
+            "sulphur_dioxide,"
+            "ozone,"
+            "european_aqi"
+        ),
+        "timezone": DEFAULT_TIMEZONE,
+    }
 
-response = requests.get(url, params=params, timeout=30)
-response.raise_for_status()
+    response = requests.get(OPEN_METEO_URL, params=params, timeout=30)
+    response.raise_for_status()
 
-data = response.json()
+    data = response.json()
+    return data
 
 print("Latitude :", data["latitude"])
 print("Longitude :", data["longitude"])
