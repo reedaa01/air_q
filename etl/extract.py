@@ -27,10 +27,10 @@ def fetch_air_quality(latitude, longitude):
         print("Erreur lors de l'appel à Open-Meteo :", error)
         return None
 
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     data = fetch_air_quality(
         34.0132,
         -6.8326,
     )
 
-    print(data)
+    print(data)"""

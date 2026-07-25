@@ -14,10 +14,3 @@ CITIES = [
     },
 ]
 
-if __name__ == "__main__":
-    data = fetch_air_quality(
-        34.0132,
-        -6.8326,
-    )
-
-    print(data)
