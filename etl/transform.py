@@ -36,6 +36,7 @@ def transform_air_quality(data:dict) -> pd.DataFrame:
         raise ValueError(f"Les colonnes suivantes sont manquantes dans les données Open-Meteo : {sorted(missing_columns)}")
 
     df["time"] = pd.to_datetime(df["time"])
+    df = df.rename(columns={"time": "measured_at"})
     df["latitude"] = data["latitude"]
     df["longitude"] = data["longitude"]
     df["timezone"] = data["timezone"]

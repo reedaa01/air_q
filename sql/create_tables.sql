@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS air_quality_measurements (
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
     timezone VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE (measured_at, latitude, longitude)
 );
