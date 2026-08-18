@@ -4,7 +4,12 @@ from config import DEFAULT_TIMEZONE,OPEN_METEO_URL,REQUEST_TIMEOUT
 
 logger = logging.getLogger(__name__)
 
-def fetch_air_quality(latitude :float, longitude:float,) -> dict:
+def fetch_air_quality(
+    latitude: float,
+    longitude: float,
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> dict:
     """
     Récupère les données horaires de qualité de l'air depuis Open-Meteo.
 
@@ -40,6 +45,12 @@ def fetch_air_quality(latitude :float, longitude:float,) -> dict:
         ),
         "timezone": DEFAULT_TIMEZONE,
     }
+
+    if start_date:
+        params["start_date"] = start_date
+    if end_date:
+        params["end_date"] = end_date
+
     try:
         response = requests.get(OPEN_METEO_URL, params=params, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
