@@ -57,10 +57,13 @@ def fetch_air_quality(latitude :float, longitude:float,) -> dict:
         raise
 
 if __name__ == "__main__":
+    from config import CITIES
     logging.basicConfig(level=logging.INFO)
-    data = fetch_air_quality(
-        34.0132,
-        -6.8326,
-    )
 
-    print(data["hourly"].keys())
+    for city in CITIES:
+        data = fetch_air_quality(
+            city["latitude"],
+            city["longitude"],
+        )
+        print(f"Ville : {city['name']}")
+        print(data["hourly"].keys())

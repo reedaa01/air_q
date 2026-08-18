@@ -23,7 +23,7 @@ MEASUREMENT_COLUMNS = [
 ]
 
 
-def transform_air_quality(data: dict) -> pd.DataFrame:
+def transform_air_quality(data: dict, city_name: str) -> pd.DataFrame:
     """
     Transforme la réponse JSON Open-Meteo en DataFrame pandas.
 
@@ -66,6 +66,7 @@ def transform_air_quality(data: dict) -> pd.DataFrame:
     ).copy()
 
     # Ajout des métadonnées
+    df["city_name"] = city_name
     df["latitude"] = data["latitude"]
     df["longitude"] = data["longitude"]
     df["timezone"] = data["timezone"]
@@ -82,14 +83,20 @@ def transform_air_quality(data: dict) -> pd.DataFrame:
 
 if __name__ == "__main__":
     from etl.extract import fetch_air_quality
+    from config import CITIES
 
-    data = fetch_air_quality(
-        latitude=34.0132,
-        longitude=-6.8326,
-    )
+    for city in CITIES: 
+        print(f"\nTransformation de la ville : {city['name']}")
+        
+        data = fetch_air_quality(
+            latitude=city["latitude"],
+            longitude=city["longitude"],
+        )
 
-    df = transform_air_quality(data)
+        df = transform_air_quality(
+            data,
+            city_name=city["name"],)
 
-    print(df.head())
-    print(df.shape)
-    print(df.dtypes)
+        print(df.head())
+        print(df.shape)
+        print(df.dtypes)
