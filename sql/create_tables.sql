@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS air_quality_measurements (
     sulphur_dioxide DOUBLE PRECISION,
     ozone DOUBLE PRECISION,
     european_aqi INTEGER,
+    city_name VARCHAR(100) NOT NULL,
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
     timezone VARCHAR(100) NOT NULL,

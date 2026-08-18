@@ -73,12 +73,19 @@ def load_air_quality(df: pd.DataFrame) -> None:
 if __name__ == "__main__":
     from etl.extract import fetch_air_quality
     from etl.transform import transform_air_quality
+    from config import CITIES
 
-    data = fetch_air_quality(
-        latitude=34.0132,
-        longitude=-6.8326,
-    )
+    for city in CITIES:
+        print(f"\nTraitement de la ville : {city['name']}")
 
-    df = transform_air_quality(data)
+        data = fetch_air_quality(
+            latitude=city["latitude"],
+            longitude=city["longitude"],
+        )
 
-    load_air_quality(df)
+        df = transform_air_quality(
+            data,
+            city_name=city["name"],
+        )
+
+        load_air_quality(df)
