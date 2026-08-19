@@ -59,6 +59,14 @@ def transform_air_quality(data: dict, city_name: str) -> pd.DataFrame:
     df["time"] = pd.to_datetime(df["time"])
     df = df.rename(columns={"time": "measured_at"})
 
+    # Détermination des données futures
+    current_time = pd.Timestamp.now(
+        tz=data["timezone"]
+    ).tz_localize(None)
+
+    df["is_forecast"] = df["measured_at"] > current_time
+    
+
     # Suppression des lignes où toutes les mesures sont nulles
     df = df.dropna(
         subset=MEASUREMENT_COLUMNS,

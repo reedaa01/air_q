@@ -9,6 +9,8 @@ def fetch_air_quality(
     longitude: float,
     start_date: str | None = None,
     end_date: str | None = None,
+    start_hour: str | None = None,
+    end_hour: str | None = None,
 ) -> dict:
     """
     Récupère les données horaires de qualité de l'air depuis Open-Meteo.
@@ -50,6 +52,12 @@ def fetch_air_quality(
         params["start_date"] = start_date
     if end_date:
         params["end_date"] = end_date
+
+    if start_hour:
+        params["start_hour"] = start_hour
+
+    if end_hour:
+        params["end_hour"] = end_hour
 
     try:
         response = requests.get(OPEN_METEO_URL, params=params, timeout=REQUEST_TIMEOUT)

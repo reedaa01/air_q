@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS air_quality_measurements (
     longitude DOUBLE PRECISION NOT NULL,
     timezone VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
+    is_forecast BOOLEAN NOT NULL DEFAULT FALSE,
+    
     UNIQUE (measured_at, latitude, longitude)
 );

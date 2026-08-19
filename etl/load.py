@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine, URL
 from sqlalchemy.dialects.postgresql import insert
 
@@ -35,6 +35,27 @@ def create_database_engine() -> Engine:
     )
     return create_engine(database_url)
 
+
+def get_latest_measurement_time(engine: Engine, city_name: str):
+    """
+    Retourne la date/heure de la mesure la plus récente
+    enregistrée pour une ville.
+
+    Retourne None si la ville n'a encore aucune donnée.
+    """
+    query = text("""
+        SELECT MAX(measured_at)
+        FROM air_quality_measurements
+        WHERE city_name = :city_name
+            and is_forecast = FALSE
+        """)
+
+    with engine.connect() as connection:
+        result = connection.execute(
+            query,
+            {"city_name": city_name}
+        )
+        return result.scalar()
 
 def insert_ignore_duplicates(table, connection, keys, data_iter):
     rows = [dict(zip(keys, row)) for row in data_iter]
