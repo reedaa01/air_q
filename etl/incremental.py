@@ -6,6 +6,11 @@ from etl.extract import fetch_air_quality
 from etl.transform import transform_air_quality
 from config import CITIES, DEFAULT_TIMEZONE
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 def get_incremental_start(latest_measurement):
     """
     Calcule l'heure à partir de laquelle reprendre l'ingestion.
@@ -41,10 +46,11 @@ def get_incremental_end(timezone: str):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     engine = create_database_engine()
 
     for city in CITIES:
-        print(f"\nTraitement incrémental : {city['name']}")
+        logger.info(f"\nTraitement incrémental : %s", city['name'])
 
         latest = get_latest_measurement_time(
             engine,
@@ -57,9 +63,9 @@ if __name__ == "__main__":
         start_hour = format_open_meteo_hour(start)
         end_hour = format_open_meteo_hour(end)
 
-        print("Dernière mesure :", latest)
-        print("start_hour :", start_hour)
-        print("end_hour :", end_hour)
+        logger.info("Dernière mesure : %s", latest)
+        logger.info("start_hour : %s", start_hour)
+        logger.info("end_hour : %s", end_hour)
 
         data = fetch_air_quality(
             latitude=city["latitude"],

@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine, URL
 from sqlalchemy.dialects.postgresql import insert
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
@@ -103,16 +107,18 @@ def load_air_quality(df: pd.DataFrame) -> None:
         method=insert_or_update,
     )
 
-    print("Données chargées avec succès dans PostgreSQL.")
-    print(f"Nombre de lignes réellement insérées : {inserted_rows}")
+    logger.info("Données chargées avec succès dans PostgreSQL.")
+    logger.info(f"Nombre de lignes traitées par l'UPSERT : %s ",inserted_rows)
 
 if __name__ == "__main__":
     from etl.extract import fetch_air_quality
     from etl.transform import transform_air_quality
     from config import CITIES
 
+   
+
     for city in CITIES:
-        print(f"\nTraitement de la ville : {city['name']}")
+        logger.info(f"\nTraitement de la ville : {city['name']}")
 
         data = fetch_air_quality(
             latitude=city["latitude"],

@@ -1,4 +1,8 @@
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 REQUIRED_COLUMNS = {
@@ -79,12 +83,12 @@ def transform_air_quality(data: dict, city_name: str) -> pd.DataFrame:
     df["longitude"] = data["longitude"]
     df["timezone"] = data["timezone"]
 
-    print("Nombre total de lignes :", len(df))
+    logger.info("Nombre total de lignes : %s", len(df))
 
-    print(
-    "Lignes complètement vides :",
-    df[MEASUREMENT_COLUMNS].isna().all(axis=1).sum(),
-)
+    logger.info(
+        "Lignes complètement vides : %s",
+        df[MEASUREMENT_COLUMNS].isna().all(axis=1).sum(),
+    )
 
     return df
 
