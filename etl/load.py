@@ -57,13 +57,28 @@ def get_latest_measurement_time(engine: Engine, city_name: str):
         )
         return result.scalar()
 
-def insert_ignore_duplicates(table, connection, keys, data_iter):
+def insert_or_update(table, connection, keys, data_iter):
     rows = [dict(zip(keys, row)) for row in data_iter]
 
     statement = insert(table.table).values(rows)
 
-    statement = statement.on_conflict_do_nothing(
-        index_elements=["measured_at", "latitude", "longitude"]
+    statement = statement.on_conflict_do_update(
+        index_elements=["measured_at", "latitude", "longitude"],
+
+        #on remplace l'encienne par la nouvelle 
+        set_={
+            "pm10": statement.excluded.pm10,
+            "pm2_5": statement.excluded.pm2_5,
+            "carbon_monoxide": statement.excluded.carbon_monoxide,
+            "nitrogen_dioxide": statement.excluded.nitrogen_dioxide,
+            "sulphur_dioxide": statement.excluded.sulphur_dioxide,
+            "ozone": statement.excluded.ozone,
+            "european_aqi": statement.excluded.european_aqi,
+            "city_name": statement.excluded.city_name,
+            "timezone": statement.excluded.timezone,
+            "is_forecast": statement.excluded.is_forecast,
+        },
+
     )
 
     result = connection.execute(statement)
@@ -85,7 +100,7 @@ def load_air_quality(df: pd.DataFrame) -> None:
         con=engine,
         if_exists="append",
         index=False,
-        method=insert_ignore_duplicates,
+        method=insert_or_update,
     )
 
     print("Données chargées avec succès dans PostgreSQL.")
