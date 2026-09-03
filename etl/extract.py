@@ -84,5 +84,5 @@ if __name__ == "__main__":
             city["latitude"],
             city["longitude"],
         )
-        print(f"Ville : {city['name']}")
-        print(data["hourly"].keys())
+        logger.info(f"Ville : {city['name']}")
+        logger.info(data["hourly"].keys())

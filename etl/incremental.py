@@ -36,6 +36,19 @@ def format_open_meteo_hour(dt):
 
     return dt.strftime("%Y-%m-%dT%H:%M")
 
+def get_initial_start(timezone: str, lookback_days: int = 7):
+    """
+    Calcule le point de départ pour une ville
+    qui n'a encore aucune donnée en base.
+    """
+    current_time = (
+        pd.Timestamp.now(tz=timezone)
+        .floor("h")
+        .tz_localize(None)
+    )
+
+    return current_time - timedelta(days=lookback_days)
+
 def get_incremental_end(timezone: str):
     """
     Calcule l'heure de fin de la fenêtre incrémentale.
@@ -45,8 +58,7 @@ def get_incremental_end(timezone: str):
 
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+def run_incremental_pipeline():
     engine = create_database_engine()
 
     for city in CITIES:
@@ -57,7 +69,15 @@ if __name__ == "__main__":
             city["name"],
         )
 
-        start = get_incremental_start(latest)
+        if latest is None:
+            logger.info(
+                "Aucune donnée existante pour %s : initialisation sur les 7 derniers jours.",
+                city["name"],
+            )
+            start = get_initial_start(DEFAULT_TIMEZONE)
+        else:
+            start = get_incremental_start(latest)
+
         end = get_incremental_end(DEFAULT_TIMEZONE)
 
         start_hour = format_open_meteo_hour(start)
@@ -80,3 +100,7 @@ if __name__ == "__main__":
         )
 
         load_air_quality(df)
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    run_incremental_pipeline()
