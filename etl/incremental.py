@@ -56,50 +56,62 @@ def get_incremental_end(timezone: str):
     current_time = pd.Timestamp.now(tz=timezone).floor("h").tz_localize(None)
     return current_time + timedelta(days=4)
 
+def process_city_incremental(city: dict, engine):
+    """
+    Exécute l'ingestion incrémentale pour une seule ville.
+    """
+    logger.info(
+        "Traitement incrémental : %s",
+        city["name"],
+    )
+
+    latest = get_latest_measurement_time(
+        engine,
+        city["name"],
+    )
+
+    if latest is None:
+        logger.info(
+            "Aucune donnée existante pour %s : initialisation sur les 7 derniers jours.",
+            city["name"],
+        )
+        start = get_initial_start(DEFAULT_TIMEZONE)
+    else:
+        start = get_incremental_start(latest)
+
+    end = get_incremental_end(DEFAULT_TIMEZONE)
+
+    start_hour = format_open_meteo_hour(start)
+    end_hour = format_open_meteo_hour(end)
+
+    logger.info("Dernière mesure : %s", latest)
+    logger.info("start_hour : %s", start_hour)
+    logger.info("end_hour : %s", end_hour)
+
+    data = fetch_air_quality(
+        latitude=city["latitude"],
+        longitude=city["longitude"],
+        start_hour=start_hour,
+        end_hour=end_hour,
+    )
+
+    df = transform_air_quality(
+        data,
+        city_name=city["name"],
+    )
+
+    load_air_quality(df)
 
 
 def run_incremental_pipeline():
     engine = create_database_engine()
 
     for city in CITIES:
-        logger.info(f"\nTraitement incrémental : %s", city['name'])
-
-        latest = get_latest_measurement_time(
-            engine,
-            city["name"],
+        process_city_incremental(
+            city=city,
+            engine=engine,
         )
-
-        if latest is None:
-            logger.info(
-                "Aucune donnée existante pour %s : initialisation sur les 7 derniers jours.",
-                city["name"],
-            )
-            start = get_initial_start(DEFAULT_TIMEZONE)
-        else:
-            start = get_incremental_start(latest)
-
-        end = get_incremental_end(DEFAULT_TIMEZONE)
-
-        start_hour = format_open_meteo_hour(start)
-        end_hour = format_open_meteo_hour(end)
-
-        logger.info("Dernière mesure : %s", latest)
-        logger.info("start_hour : %s", start_hour)
-        logger.info("end_hour : %s", end_hour)
-
-        data = fetch_air_quality(
-            latitude=city["latitude"],
-            longitude=city["longitude"],
-            start_hour=start_hour,
-            end_hour=end_hour,
-        )
-
-        df = transform_air_quality(
-            data,
-            city_name=city["name"],
-        )
-
-        load_air_quality(df)
+        
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

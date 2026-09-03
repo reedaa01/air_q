@@ -223,3 +223,56 @@ def test_run_incremental_pipeline_with_no_existing_data(monkeypatch):
     )
 
     mock_load.assert_called_once_with(fake_df)
+
+
+
+#test de process_city_incremental
+def test_process_city_incremental(monkeypatch):
+    fake_engine = MagicMock()
+    fake_data = {"hourly": {"time": ["2026-09-02T18:00"]}}
+    fake_df = MagicMock()
+
+    city = {
+        "name": "Rabat",
+        "latitude": 34.0132,
+        "longitude": -6.8326,
+    }
+
+    monkeypatch.setattr(
+        incremental,
+        "get_latest_measurement_time",
+        lambda engine, city_name: datetime(2026, 9, 2, 17, 0),
+    )
+
+    monkeypatch.setattr(
+        incremental,
+        "get_incremental_end",
+        lambda timezone: datetime(2026, 9, 6, 18, 0),
+    )
+
+    mock_fetch = MagicMock(return_value=fake_data)
+    mock_transform = MagicMock(return_value=fake_df)
+    mock_load = MagicMock()
+
+    monkeypatch.setattr(incremental, "fetch_air_quality", mock_fetch)
+    monkeypatch.setattr(incremental, "transform_air_quality", mock_transform)
+    monkeypatch.setattr(incremental, "load_air_quality", mock_load)
+
+    incremental.process_city_incremental(
+        city=city,
+        engine=fake_engine,
+    )
+
+    mock_fetch.assert_called_once_with(
+        latitude=34.0132,
+        longitude=-6.8326,
+        start_hour="2026-09-02T18:00",
+        end_hour="2026-09-06T18:00",
+    )
+
+    mock_transform.assert_called_once_with(
+        fake_data,
+        city_name="Rabat",
+    )
+
+    mock_load.assert_called_once_with(fake_df)
