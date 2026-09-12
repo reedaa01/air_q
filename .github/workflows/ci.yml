@@ -5,9 +5,30 @@ on:
     branches:
       - main
       - feature/**
+    paths:
+      - etl/**
+      - sql/**
+      - requirements.txt
+      - Dockerfile
+      - docker-compose.yml
+      - config.py
+      - test_open_meteo.py
+      - .github/workflows/ci.yml
+      - tests/**
+
   pull_request:
     branches:
       - main
+    paths:
+      - etl/**
+      - sql/**
+      - requirements.txt
+      - Dockerfile
+      - docker-compose.yml
+      - config.py
+      - test_open_meteo.py
+      - .github/workflows/ci.yml
+      - tests/**
 
 jobs:
   test:
