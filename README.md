@@ -119,12 +119,6 @@ Run incremental ingestion:
 python -m etl.incremental
 ```
 
-Run historical backfill:
-
-```powershell
-python etl/backfill.py 2026-01-01 2026-01-31
-```
-
 Run API test script:
 
 ```powershell
