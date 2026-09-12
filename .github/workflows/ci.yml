@@ -16,6 +16,7 @@ on:
       - .github/workflows/ci.yml
       - tests/**
 
+
   pull_request:
     branches:
       - main
@@ -29,6 +30,9 @@ on:
       - test_open_meteo.py
       - .github/workflows/ci.yml
       - tests/**
+
+  workflow_dispatch:
+   
 
 jobs:
   test:
