@@ -1,0 +1,1 @@
+"""Morocco air quality backend."""
