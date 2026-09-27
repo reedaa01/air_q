@@ -1,34 +1,48 @@
-import { AQICard } from "@/components/air-quality/AQICard";
-import { PollutantCard } from "@/components/air-quality/PollutantCard";
-import { ChartCard } from "@/components/charts/ChartCard";
+import { Dashboard } from "@/components/dashboard/Dashboard";
+import type { Metadata } from "next";
+import { cityDisplayName } from "@/lib/air-quality";
 
-type CityDetailsPageProps = {
-  params: Promise<{
-    citySlug: string;
-  }>;
-};
-
-export default async function CityDetailsPage({ params }: CityDetailsPageProps) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ citySlug: string }>;
+}): Promise<Metadata> {
   const { citySlug } = await params;
-  const cityName = citySlug.replaceAll("-", " ");
-
-  return (
-    <section className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
-      <div>
-        <p className="text-sm font-semibold uppercase tracking-wide text-primary">City Details</p>
-        <h1 className="mt-2 text-3xl font-semibold capitalize">{cityName}</h1>
-        <p className="mt-2 text-muted">
-          Placeholder page for city-level air quality metrics, pollutant trends, and station
-          summaries.
-        </p>
-      </div>
-      <div className="grid gap-6 lg:grid-cols-3">
-        <AQICard />
-        <PollutantCard />
-        <PollutantCard />
-      </div>
-      <ChartCard />
-      {/* TODO: Connect this route to city metadata, station data, pollutant history, and forecast APIs. */}
-    </section>
-  );
+  const name = cityDisplayName(citySlug);
+  const title = `Qualité de l’air à ${name}`;
+  const description = `Consultez l’indice européen, les polluants et les prévisions de qualité de l’air à ${name} sur Aeris.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: `/cities/${encodeURIComponent(citySlug)}` },
+    openGraph: {
+      title: `${title} · Aeris`,
+      description,
+      siteName: "Aeris",
+      locale: "fr_MA",
+      type: "website",
+      images: [
+        {
+          url: "/opengraph-image",
+          width: 1200,
+          height: 630,
+          alt: "Aeris — La qualité de l’air au Maroc",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} · Aeris`,
+      description,
+      images: ["/opengraph-image"],
+    },
+  };
+}
+export default async function CityDetailsPage({
+  params,
+}: {
+  params: Promise<{ citySlug: string }>;
+}) {
+  const { citySlug } = await params;
+  return <Dashboard key={citySlug} initialSlug={citySlug} detail />;
 }

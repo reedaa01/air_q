@@ -1,17 +1,25 @@
-type ErrorStateProps = {
+"use client";
+import { AlertCircle, RefreshCw } from "lucide-react";
+export function ErrorState({
+  title = "Données indisponibles",
+  message = "Le service de données est momentanément inaccessible.",
+  onRetry,
+}: {
   title?: string;
   message?: string;
-};
-
-export function ErrorState({
-  title = "Unable to load data",
-  message = "A placeholder error state for future API failures.",
-}: ErrorStateProps) {
+  onRetry?: () => void;
+}) {
   return (
-    <div className="rounded-lg border border-border bg-surface p-5 shadow-soft">
-      <h2 className="text-lg font-semibold">{title}</h2>
-      <p className="mt-2 text-sm text-muted">{message}</p>
-      {/* TODO: Add retry actions, error codes, and support links once API behavior is defined. */}
+    <div className="data-state data-error" role="alert">
+      <AlertCircle size={22} />
+      <h2>{title}</h2>
+      <p>{message}</p>
+      {onRetry && (
+        <button onClick={onRetry}>
+          <RefreshCw size={14} />
+          Réessayer
+        </button>
+      )}
     </div>
   );
 }

@@ -1,0 +1,1045 @@
+/* Aeris visual system: neutral surfaces, generous spacing, restrained accents. */
+:root {
+  --background: #f5f5f7;
+  --foreground: #1d1d1f;
+  --muted: #646469;
+  --border: #e5e5e8;
+  --primary: #28665c;
+  --shadow: 0 8px 32px rgb(0 0 0 / 3%);
+}
+body {
+  background: var(--background);
+  font-size: 15px;
+  letter-spacing: -0.015em;
+}
+html {
+  scroll-padding-top: 90px;
+}
+.site-header {
+  background: rgb(250 250 252 / 88%);
+  border-bottom: 1px solid rgb(0 0 0 / 6%);
+}
+.nav-inner {
+  max-width: 1200px;
+  min-height: 72px;
+  gap: 20px;
+}
+.brand .brand-wordmark {
+  font-size: 27px;
+}
+.main-nav {
+  background: none;
+  border: 0;
+  padding: 0;
+  gap: 4px;
+}
+.main-nav a {
+  font-size: 12px;
+  color: #55555a;
+  padding: 10px 13px;
+}
+.main-nav a:hover,
+.main-nav .active {
+  background: #eaeaed;
+  color: #1d1d1f;
+  box-shadow: none;
+}
+.nav-about {
+  color: var(--primary);
+  font-size: 12px;
+}
+.nav-toggle {
+  display: none;
+}
+.dashboard-content,
+.site-footer {
+  max-width: 1200px;
+}
+.page-intro {
+  padding: 90px 0 72px;
+}
+.intro-tag {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--primary);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+}
+.intro-tag svg {
+  display: none;
+}
+.page-intro h1 {
+  font-size: clamp(56px, 7.5vw, 94px);
+  font-weight: 650;
+  line-height: 1.06;
+  letter-spacing: -0.065em;
+  margin: 24px 0;
+}
+.page-intro h1 > span {
+  color: var(--primary);
+}
+.page-intro > p {
+  color: var(--muted);
+  font-size: 21px;
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+}
+.intro-source {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+.intro-source > span {
+  display: none;
+}
+.intro-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+.button-primary,
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  min-height: 46px;
+}
+.button-primary {
+  padding: 12px 23px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 999px;
+}
+.button-primary:hover {
+  background: #1e534b;
+  box-shadow: 0 4px 14px rgb(40 102 92 / 15%);
+}
+.button-secondary {
+  color: var(--primary);
+}
+.button-secondary:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.observatory-content {
+  scroll-margin-top: 90px;
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+.city-selector {
+  margin-bottom: 25px;
+}
+.selector-heading {
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+.selector-heading .eyebrow {
+  font-size: 11px;
+}
+.selector-heading h2 {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  margin-top: 8px;
+}
+.search-field {
+  height: 46px;
+  background: #fff;
+  border-color: var(--border);
+  border-radius: 12px;
+}
+.search-field input {
+  font-size: 14px;
+}
+.search-results {
+  border-radius: 16px;
+}
+.search-results > p {
+  font-size: 11px;
+}
+.search-results > button {
+  font-size: 14px;
+  min-height: 44px;
+}
+.city-pills {
+  gap: 8px;
+}
+.city-pill {
+  font-size: 13px;
+  padding: 11px 20px;
+  min-height: 44px;
+  border-color: var(--border);
+  background: #fff;
+  color: #56565c;
+}
+.city-pill.selected {
+  background: #1d1d1f;
+  border-color: #1d1d1f;
+  box-shadow: none;
+}
+.city-pill:hover {
+  transform: none;
+}
+.aqi-card,
+.panel,
+.map-panel,
+.pollutant-item {
+  background: #fff;
+  border: 1px solid rgb(0 0 0 / 3%);
+  box-shadow: var(--shadow);
+}
+.aqi-card {
+  padding: 48px 54px 28px;
+  border-radius: 28px;
+}
+.aqi-card::before {
+  display: none;
+}
+.location-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+.aqi-city-info h2 {
+  font-size: 48px;
+  color: var(--foreground);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+.aqi-description {
+  color: var(--muted);
+  font-size: 18px;
+}
+.measurement-time {
+  color: var(--muted);
+  margin: 24px 0;
+}
+.measurement-time span,
+.measurement-time small {
+  font-size: 12px;
+}
+.measurement-time strong {
+  font-size: 14px;
+  color: var(--foreground);
+}
+.text-link {
+  font-size: 14px;
+  color: var(--primary);
+  min-height: 32px;
+}
+.aqi-orb {
+  box-shadow: none;
+  border: 0;
+  background: radial-gradient(
+    circle at 40% 30%,
+    #fff,
+    color-mix(in srgb, var(--aqi-color) 12%, white)
+  );
+}
+.aqi-orb::before {
+  inset: -10px;
+  border-color: color-mix(in srgb, var(--aqi-color) 18%, transparent);
+}
+.aqi-orb::after,
+.aqi-orb > div,
+.aqi-orb > svg {
+  display: none;
+}
+.aqi-number {
+  font-weight: 550;
+  letter-spacing: -0.065em;
+  color: var(--foreground);
+}
+.aqi-overline {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.aqi-badge {
+  font-size: 12px;
+  padding: 8px 14px;
+}
+.aqi-card-bottom {
+  border-color: var(--border);
+}
+.aqi-card-bottom > span,
+.aqi-scale-labels {
+  font-size: 11px;
+  color: var(--muted);
+}
+.data-notice {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 18px 4px 0;
+  flex-wrap: wrap;
+}
+.section-heading h2 {
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--foreground);
+  letter-spacing: -1px;
+  line-height: 1.25;
+}
+.section-heading p {
+  font-size: 14px;
+  color: var(--muted);
+}
+.section-caption {
+  font-size: 12px;
+  color: var(--muted);
+}
+.pollutant-panel {
+  margin: 56px 0 40px;
+}
+.pollutant-grid {
+  gap: 14px;
+  margin-top: 24px;
+}
+.pollutant-item {
+  border-radius: 20px;
+  padding: 24px 18px;
+}
+.pollutant-item:hover {
+  transform: none;
+  box-shadow: var(--shadow);
+}
+.pollutant-symbol {
+  font-size: 14px;
+  color: var(--foreground);
+}
+.pollutant-dot {
+  display: none;
+}
+.pollutant-value strong {
+  font-size: 32px;
+  font-weight: 550;
+}
+.pollutant-value > span,
+.pollutant-name {
+  font-size: 12px;
+  color: var(--muted);
+}
+.panel {
+  border-radius: 26px;
+  padding: 36px;
+}
+.chart-panel {
+  margin-bottom: 28px;
+}
+.segmented-control {
+  background: #f0f0f2;
+  border-radius: 10px;
+}
+.segmented-control button {
+  font-size: 12px;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+.chart-mode > span,
+.chart-average,
+.metric-select select,
+.chart-footnote {
+  font-size: 12px;
+  color: var(--muted);
+}
+.metric-select select {
+  min-height: 40px;
+}
+.chart-meta > span {
+  font-size: 14px;
+}
+.chart-canvas {
+  height: 300px;
+}
+.forecast-panel {
+  margin-top: 28px;
+}
+.forecast-day {
+  background: #f5f5f7;
+  border: 0;
+  border-radius: 18px;
+  padding: 22px;
+}
+.forecast-day-label {
+  font-size: 13px;
+  color: var(--foreground);
+}
+.forecast-day p,
+.forecast-value > span,
+.forecast-note,
+.forecast-day .aqi-badge {
+  font-size: 12px;
+}
+.forecast-note {
+  line-height: 1.7;
+  color: var(--muted);
+}
+.forecast-empty p {
+  font-size: 14px;
+}
+.explore-grid {
+  gap: 28px;
+  margin-top: 28px;
+}
+.map-panel {
+  border-radius: 26px;
+}
+.map-panel-heading {
+  padding: 32px;
+}
+.map-panel h2 {
+  font-size: 28px;
+  letter-spacing: -1px;
+}
+.map-count,
+.map-caption,
+.map-legend {
+  font-size: 11px;
+}
+.map-legend {
+  row-gap: 12px;
+}
+.city-table-heading {
+  font-size: 11px;
+  color: var(--muted);
+}
+.city-row-name {
+  font-size: 14px;
+}
+.aqi-chip > span {
+  font-size: 11px;
+}
+.city-detail-link {
+  width: 44px;
+  height: 44px;
+}
+.all-cities-button {
+  min-height: 44px;
+  font-size: 13px;
+}
+.discovery-banner {
+  background: #e9eeec;
+  border-radius: 26px;
+  margin: 56px 0;
+  padding: 40px;
+  gap: 24px;
+}
+.discovery-icon {
+  display: none;
+}
+.discovery-banner h2 {
+  font-size: 27px;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+  line-height: 1.25;
+}
+.discovery-banner p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.discovery-banner > a {
+  background: #fff;
+  border: 0;
+  font-size: 13px;
+  min-height: 44px;
+  padding: 12px 18px;
+  margin-left: auto;
+}
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 28px;
+  padding-bottom: 36px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.site-footer .brand-wordmark {
+  font-size: 22px;
+}
+.site-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+}
+.data-state,
+.loading-skeleton {
+  background: #fff;
+  border-color: var(--border);
+  border-radius: 24px;
+}
+.data-state p {
+  font-size: 14px;
+  color: var(--muted);
+}
+.data-state button {
+  min-height: 44px;
+  font-size: 14px;
+}
+.about-page {
+  padding-top: 56px;
+  padding-bottom: 72px;
+}
+.back-link {
+  font-size: 13px;
+  min-height: 32px;
+}
+.about-page > .eyebrow {
+  margin-top: 48px;
+}
+.about-page h1 {
+  font-size: clamp(40px, 5.3vw, 66px);
+  line-height: 1.12;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+.about-page h1 em {
+  color: var(--primary);
+}
+.about-lead {
+  font-size: 19px;
+  line-height: 1.65;
+  max-width: 760px;
+  color: var(--muted);
+  margin-top: 28px;
+}
+.about-lead .brand-wordmark {
+  font-size: 1em;
+}
+.about-cards {
+  margin-top: 48px;
+}
+.about-page h2 {
+  font-size: 25px;
+  line-height: 1.25;
+}
+.about-page .panel p,
+.team-profile li {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.team-project {
+  padding: 40px;
+  margin-top: 48px;
+}
+.team-grid {
+  gap: 24px;
+}
+.team-profile {
+  padding: 36px;
+}
+.team-profile > svg {
+  width: 40px;
+  height: 40px;
+  padding: 9px;
+  border-radius: 12px;
+  background: #edf3f0;
+}
+.team-profile h3 {
+  font-size: 16px;
+  margin-top: 30px;
+}
+.scale-grid p,
+.about-pollutants article span {
+  font-size: 13px;
+}
+@media (max-width: 1024px) {
+  .nav-inner {
+    padding-inline: 28px;
+  }
+  .main-nav a {
+    padding-inline: 10px;
+  }
+  .aqi-card {
+    padding: 36px;
+  }
+  .pollutant-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .explore-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-cards {
+    grid-template-columns: 1fr;
+  }
+  .about-cards .panel {
+    padding: 30px;
+  }
+}
+@media (max-width: 767px) {
+  .nav-inner {
+    min-height: 64px;
+    padding: 10px 20px;
+    gap: 0;
+    justify-content: space-between;
+  }
+  .brand {
+    margin-right: 0;
+  }
+  .brand .brand-wordmark {
+    font-size: 25px;
+  }
+  .nav-toggle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    color: var(--foreground);
+  }
+  .nav-toggle:hover {
+    background: #eaeaed;
+  }
+  .main-nav {
+    display: none;
+    width: 100%;
+    padding: 12px 0;
+    order: 3;
+    border-radius: 0;
+    overflow: visible;
+  }
+  .main-nav.is-open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .main-nav a {
+    flex: none;
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+  .nav-about {
+    display: none;
+  }
+  .dashboard-content {
+    padding-inline: 20px;
+  }
+  .page-intro {
+    padding: 62px 0 52px;
+  }
+  .page-intro h1 {
+    font-size: clamp(48px, 11vw, 74px);
+    letter-spacing: -0.06em;
+    margin: 22px 0;
+  }
+  .page-intro > p {
+    font-size: 17px;
+    padding-inline: 4px;
+  }
+  .intro-tag {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+  .intro-source {
+    font-size: 11px;
+  }
+  .intro-actions {
+    gap: 10px 20px;
+    margin-top: 26px;
+  }
+  .button-primary,
+  .button-secondary {
+    font-size: 13px;
+  }
+  .selector-heading h2 {
+    font-size: 25px;
+  }
+  .selector-heading {
+    gap: 18px;
+  }
+  .city-pills {
+    margin-right: -20px;
+    padding-right: 20px;
+  }
+  .city-pill {
+    font-size: 13px;
+    padding-inline: 17px;
+  }
+  .aqi-card {
+    padding: 28px 24px;
+    border-radius: 24px;
+  }
+  .aqi-city-info h2 {
+    font-size: 39px;
+  }
+  .aqi-description {
+    font-size: 16px;
+  }
+  .aqi-city-info > .text-link {
+    font-size: 13px;
+  }
+  .aqi-visual {
+    min-height: 280px;
+    margin-top: 25px;
+  }
+  .aqi-number {
+    font-size: 94px;
+  }
+  .aqi-overline {
+    font-size: 10px;
+  }
+  .data-notice {
+    font-size: 12px;
+  }
+  .section-heading {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .section-heading h2 {
+    font-size: 25px;
+  }
+  .section-heading .eyebrow {
+    font-size: 10px;
+  }
+  .section-heading p {
+    font-size: 14px;
+  }
+  .section-caption {
+    display: block;
+    font-size: 12px;
+  }
+  .pollutant-panel {
+    margin-top: 40px;
+  }
+  .pollutant-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .pollutant-item {
+    padding: 22px 18px;
+  }
+  .pollutant-name {
+    min-height: 0;
+  }
+  .panel {
+    padding: 26px 22px;
+    border-radius: 24px;
+  }
+  .chart-mode {
+    gap: 14px;
+  }
+  .chart-mode > span,
+  .chart-average,
+  .chart-footnote {
+    font-size: 12px;
+  }
+  .chart-meta {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .chart-meta > span {
+    font-size: 14px;
+  }
+  .metric-select select {
+    font-size: 12px;
+    padding: 10px 28px 10px 12px;
+  }
+  .metric-select svg {
+    top: 14px;
+  }
+  .chart-canvas {
+    height: 250px;
+  }
+  .forecast-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .forecast-day {
+    padding: 16px;
+  }
+  .forecast-day .aqi-badge {
+    font-size: 11px;
+    padding: 6px 9px;
+  }
+  .forecast-value {
+    flex-wrap: wrap;
+  }
+  .forecast-note {
+    font-size: 12px;
+  }
+  .map-panel-heading {
+    padding: 26px 22px 18px;
+  }
+  .map-panel h2 {
+    font-size: 25px;
+  }
+  .map-legend {
+    font-size: 11px;
+  }
+  .city-select {
+    min-width: 0;
+  }
+  .city-row-name {
+    font-size: 13px;
+  }
+  .discovery-banner {
+    margin: 36px 0;
+    padding: 28px 24px;
+    gap: 20px;
+  }
+  .discovery-banner h2 {
+    font-size: 26px;
+  }
+  .discovery-banner .eyebrow {
+    font-size: 10px;
+  }
+  .discovery-banner > a {
+    margin-left: 0;
+    font-size: 13px;
+  }
+  .site-footer {
+    padding-inline: 24px;
+    font-size: 12px;
+    gap: 20px;
+  }
+  .site-footer > span {
+    gap: 8px;
+  }
+  .site-footer a {
+    margin-left: 0;
+  }
+  .about-page {
+    padding: 32px 20px 48px;
+  }
+  .about-page h1 {
+    font-size: 40px;
+    letter-spacing: -0.045em;
+  }
+  .about-lead {
+    font-size: 17px;
+  }
+  .about-cards {
+    margin-top: 32px;
+  }
+  .about-cards .panel,
+  .team-project,
+  .team-profile {
+    padding: 28px 24px;
+  }
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-page h2 {
+    font-size: 24px;
+  }
+}
+
+/* Interaction and accessible alternatives. */
+.main-nav .nav-guide-mobile {
+  display: none;
+}
+.share-city {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: -8px 0 16px;
+}
+.share-city-button,
+.profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--primary);
+  font-size: 13px;
+}
+.share-city-button {
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+.share-city-button:hover {
+  background: #e9eeec;
+}
+.share-city input {
+  width: min(100%, 360px);
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+}
+.share-help {
+  font-size: 13px;
+  color: var(--muted);
+}
+.profile-link {
+  margin-bottom: 4px;
+}
+.profile-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.search-results[hidden] {
+  display: none;
+}
+.search-results ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.search-results [role="option"] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.search-results [role="option"] span {
+  flex: 1;
+}
+.search-results [role="option"]:hover,
+.search-results [aria-selected="true"] {
+  background: #edf3f0;
+  color: #1d1d1f;
+}
+.search-field button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.chart-data-table {
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  font-size: 13px;
+}
+.chart-data-table summary {
+  padding: 12px 0;
+  cursor: pointer;
+  color: var(--primary);
+  min-height: 44px;
+}
+.chart-data-table summary:focus-visible,
+.table-scroll:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.table-scroll {
+  max-height: 320px;
+  overflow: auto;
+}
+.chart-data-table table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.chart-data-table caption {
+  text-align: left;
+  padding: 12px 0;
+  color: var(--muted);
+}
+.chart-data-table th,
+.chart-data-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+}
+.chart-data-table tbody th {
+  font-weight: 400;
+}
+.chart-data-table thead {
+  background: #f5f5f7;
+}
+.map-controls button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.aqi-chip {
+  color: #536832;
+}
+.aqi-chip.moderate {
+  color: #79601f;
+}
+.aqi-chip.poor {
+  color: #945025;
+}
+.aqi-chip.unknown {
+  color: #56636b;
+}
+:where(
+  .quiet-pill,
+  .forecast-day p,
+  .forecast-value > span,
+  .chart-footnote,
+  .map-caption,
+  .map-legend
+) {
+  color: var(--muted);
+}
+@media (max-width: 767px) {
+  .main-nav .nav-guide-mobile {
+    display: block;
+  }
+  .search-field input {
+    font-size: 16px;
+  }
+  .city-select {
+    display: grid;
+    grid-template-columns: 31px minmax(0, 1fr);
+    gap: 6px 10px;
+  }
+  .city-select .aqi-chip {
+    grid-column: 2;
+    margin-left: 0;
+    flex-wrap: wrap;
+  }
+  .aqi-chip > span {
+    white-space: normal;
+  }
+  .forecast-day .aqi-badge {
+    white-space: normal;
+  }
+  .forecast-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 359px) {
+  .forecast-grid {
+    grid-template-columns: 1fr;
+  }
+  .intro-actions {
+    flex-direction: column;
+  }
+}
+.location-label > span[lang="ar"],
+.segmented-control button,
+.forecast-value > span,
+.forecast-day > p,
+.map-count {
+  color: #60666b;
+}
+.data-notice > a {
+  color: var(--primary);
+}
+.aqi-chip.good {
+  color: #286b50;
+}
+.map-legend,
+.count-badge {
+  color: #56636b;
+}
+.map-legend > span:first-child {
+  font-size: 10px;
+}
+.back-link {
+  color: var(--primary);
+}
+.about-pollutants article span {
+  color: var(--muted);
+}

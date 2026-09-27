@@ -1,15 +1,39 @@
-export function PollutantCard() {
+import type { CSSProperties } from "react";
+import { pollutants } from "@/lib/air-quality";
+import type { City } from "@/types/city";
+export function PollutantCard({ city }: { city: City }) {
   return (
-    <article className="rounded-lg border border-border bg-surface p-5 shadow-soft">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-muted">Pollutant</p>
-        <span className="rounded-md border border-border px-2 py-1 text-xs text-muted">--</span>
+    <section className="pollutant-panel" aria-label={`Polluants à ${city.name}`}>
+      <div className="section-heading">
+        <div>
+          <span className="eyebrow">AU-DELÀ DE L’INDICE</span>
+          <h2>Ce qui compose votre air.</h2>
+        </div>
+        <span className="section-caption">Concentrations · µg/m³</span>
       </div>
-      <p className="mt-3 text-3xl font-semibold">-- ug/m3</p>
-      <p className="mt-3 text-sm text-muted">
-        Placeholder for PM2.5, PM10, NO2, O3, SO2, or CO measurements.
-      </p>
-      {/* TODO: Bind pollutant type, units, thresholds, station source, and timestamp from API data. */}
-    </article>
+      <div className="pollutant-grid">
+        {pollutants.map((pollutant, index) => (
+          <article
+            className="pollutant-item"
+            style={{ "--card-index": index } as CSSProperties}
+            key={pollutant.key}
+          >
+            <div className="pollutant-top">
+              <span className="pollutant-symbol">{pollutant.symbol}</span>
+              <span className={`pollutant-dot pollutant-dot-${index}`} aria-hidden="true" />
+            </div>
+            <div className="pollutant-value">
+              <strong>
+                {city.latest?.[pollutant.key]?.toLocaleString("fr-FR", {
+                  maximumFractionDigits: 1,
+                }) ?? "—"}
+              </strong>
+              <span>µg/m³</span>
+            </div>
+            <span className="pollutant-name">{pollutant.label}</span>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }

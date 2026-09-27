@@ -1,26 +1,79 @@
+"use client";
+import { BrandWordmark } from "@/components/ui/BrandWordmark";
 import Link from "next/link";
-
-const navigationItems = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-];
+import { usePathname } from "next/navigation";
+import { useRef, useState } from "react";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 
 export function Navbar() {
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const dashboard = pathname.startsWith("/cities/") ? pathname : "/";
   return (
-    <header className="border-b border-border bg-surface">
-      <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="text-lg font-semibold">
-          Morocco AQ
+    <header className="site-header">
+      <div
+        className="nav-inner"
+        onKeyDown={(event) => {
+          if (event.key === "Escape" && menuOpen) {
+            setMenuOpen(false);
+            menuButton.current?.focus();
+          }
+        }}
+      >
+        <Link
+          href="/"
+          className="brand"
+          aria-label="Aeris, accueil"
+          onClick={() => setMenuOpen(false)}
+        >
+          <BrandWordmark symbol />
         </Link>
-        <div className="flex items-center gap-4 text-sm font-medium text-muted">
-          {navigationItems.map((item) => (
-            <Link key={item.href} href={item.href} className="transition hover:text-foreground">
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      </nav>
-      {/* TODO: Connect navigation to authenticated areas, city search state, and deployment docs. */}
+        <button
+          ref={menuButton}
+          className="nav-toggle"
+          aria-expanded={menuOpen}
+          aria-controls="main-navigation"
+          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+        <nav
+          id="main-navigation"
+          className={`main-nav${menuOpen ? " is-open" : ""}`}
+          aria-label="Navigation principale"
+          onClick={() => setMenuOpen(false)}
+        >
+          <Link
+            href="/"
+            className={pathname === "/" ? "active" : ""}
+            aria-current={pathname === "/" ? "page" : undefined}
+          >
+            Vue d’ensemble
+          </Link>
+          <Link href={dashboard + "#villes"}>Villes</Link>
+          <Link href={dashboard + "#carte"}>Carte</Link>
+          <Link href={dashboard + "#previsions"}>Prévisions</Link>
+          <Link
+            href="/a-propos"
+            className={pathname === "/a-propos" ? "active" : ""}
+            aria-current={pathname === "/a-propos" ? "page" : undefined}
+          >
+            À propos de nous
+          </Link>
+          <Link
+            href="/about"
+            className={`nav-guide-mobile${pathname === "/about" ? " active" : ""}`}
+            aria-current={pathname === "/about" ? "page" : undefined}
+          >
+            Comprendre l’air
+          </Link>
+        </nav>
+        <Link href="/about" className="nav-about">
+          Comprendre l’air <ArrowUpRight size={14} />
+        </Link>
+      </div>
     </header>
   );
 }
