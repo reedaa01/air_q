@@ -26,31 +26,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
-  etl:
-    build:
-      context: .
-      dockerfile: Dockerfile
-
-    container_name: air-quality-etl
-
-    env_file:
-      - .env
-
-    environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "python -c \"import config\""]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
   airflow-webserver:
     image: apache/airflow:3.0.6
     container_name: airflow-webserver

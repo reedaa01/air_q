@@ -100,8 +100,18 @@ def process_city_incremental(city: dict, engine):
         city_name=city["name"],
     )
 
+    logger.info(
+        "%s : %d lignes prêtes à être chargées.",
+        city["name"],
+        len(df),
+    )
+
     load_air_quality(df)
 
+    logger.info(
+        "Traitement terminé avec succès pour %s.",
+        city["name"],
+    )
 
 def run_incremental_pipeline():
     engine = create_database_engine()

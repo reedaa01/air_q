@@ -1,5 +1,6 @@
-import pendulum
+from datetime import timedelta
 
+import pendulum
 from airflow.sdk import dag, task
 
 from config import CITIES
@@ -13,11 +14,17 @@ from etl.load import create_database_engine
         2026, 9, 1, tz="Africa/Casablanca"
     ),
     catchup=False,
+    max_active_runs=1,
     tags=["air-quality", "incremental"],
 )
 
 def air_quality_incremental():
-    @task
+    @task(
+        retries=3,
+        retry_delay=timedelta(minutes=2),
+        execution_timeout=timedelta(minutes=10),
+        max_active_tis_per_dag=2,
+    )
     def process_city(city: dict):
         engine = create_database_engine()
 
