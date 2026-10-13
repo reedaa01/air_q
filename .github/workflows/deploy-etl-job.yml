@@ -89,11 +89,9 @@ jobs:
       - name: Build and push ETL image
         run: |
           IMAGE_URI="$REGION-docker.pkg.dev/$PROJECT_ID/$AR_REPO/$AR_IMAGE:${{ github.sha }}"
-          LATEST_URI="$REGION-docker.pkg.dev/$PROJECT_ID/$AR_REPO/$AR_IMAGE:latest"
           gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
           docker build -f Dockerfile.etl.cloud -t "$IMAGE_URI" .
           docker push "$IMAGE_URI"
-          gcloud artifacts docker tags add "$IMAGE_URI" "$LATEST_URI" --project "$PROJECT_ID"
           echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
         id: image
 
