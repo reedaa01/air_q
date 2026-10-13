@@ -84,7 +84,7 @@ jobs:
       - name: Install backend dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e "apps/backend.[test]"
+          pip install -e "./apps/backend[test]"
 
       - name: Run backend tests
         run: pytest -q apps/backend/tests
@@ -109,7 +109,7 @@ jobs:
           cache-dependency-path: apps/frontend/package-lock.json
 
       - name: Install frontend dependencies
-        run: npm ci
+        run: npm install --no-fund --no-audit
 
       - name: Run frontend lint
         run: npm run lint
