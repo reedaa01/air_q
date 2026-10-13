@@ -8,6 +8,11 @@ on:
         required: true
         default: true
         type: boolean
+      confirm_deploy:
+        description: "Type YES to confirm deployment"
+        required: true
+        default: "NO"
+        type: string
 
 permissions:
   contents: read
@@ -21,8 +26,6 @@ jobs:
   deploy:
     name: Deploy Backend and Frontend
     runs-on: ubuntu-latest
-    environment:
-      name: production
 
     env:
       PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
@@ -42,6 +45,7 @@ jobs:
 
       - name: Validate required variables
         run: |
+          [[ "${{ inputs.confirm_deploy }}" == "YES" ]] || (echo "Deployment cancelled: set confirm_deploy to YES" && exit 1)
           test -n "$PROJECT_ID" || (echo "Missing repo variable GCP_PROJECT_ID" && exit 1)
           test -n "$INSTANCE_CONNECTION_NAME" || (echo "Missing repo variable GCP_INSTANCE_CONNECTION_NAME" && exit 1)
 
