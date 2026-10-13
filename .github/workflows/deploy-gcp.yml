@@ -1,0 +1,115 @@
+name: Deploy to GCP Cloud Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_frontend:
+        description: "Deploy frontend after backend"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-gcp-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Backend and Frontend
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+      INSTANCE_CONNECTION_NAME: ${{ vars.GCP_INSTANCE_CONNECTION_NAME }}
+      DB_SECRET_NAME: ${{ vars.GCP_DB_SECRET_NAME || 'air_q_db_password' }}
+      DB_NAME: ${{ vars.GCP_DB_NAME || 'air_quality_db' }}
+      DB_USER: ${{ vars.GCP_DB_USER || 'postgres' }}
+      BACKEND_SERVICE: ${{ vars.GCP_BACKEND_SERVICE || 'air-q-backend' }}
+      FRONTEND_SERVICE: ${{ vars.GCP_FRONTEND_SERVICE || 'air-q-frontend' }}
+      BACKEND_SA: ${{ vars.GCP_BACKEND_SERVICE_ACCOUNT || 'air-q-backend-sa' }}
+      FRONTEND_SA: ${{ vars.GCP_FRONTEND_SERVICE_ACCOUNT || 'air-q-frontend-sa' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate required variables
+        run: |
+          test -n "$PROJECT_ID" || (echo "Missing repo variable GCP_PROJECT_ID" && exit 1)
+          test -n "$INSTANCE_CONNECTION_NAME" || (echo "Missing repo variable GCP_INSTANCE_CONNECTION_NAME" && exit 1)
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Setup gcloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure gcloud project
+        run: gcloud config set project "$PROJECT_ID"
+
+      - name: Ensure backend service account exists
+        run: |
+          if ! gcloud iam service-accounts describe "$BACKEND_SA@$PROJECT_ID.iam.gserviceaccount.com" --project "$PROJECT_ID" >/dev/null 2>&1; then
+            gcloud iam service-accounts create "$BACKEND_SA" --display-name="Air Q backend service account" --project "$PROJECT_ID"
+          fi
+
+      - name: Ensure frontend service account exists
+        run: |
+          if ! gcloud iam service-accounts describe "$FRONTEND_SA@$PROJECT_ID.iam.gserviceaccount.com" --project "$PROJECT_ID" >/dev/null 2>&1; then
+            gcloud iam service-accounts create "$FRONTEND_SA" --display-name="Air Q frontend service account" --project "$PROJECT_ID"
+          fi
+
+      - name: Grant backend Cloud SQL and secret access
+        run: |
+          gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+            --member="serviceAccount:$BACKEND_SA@$PROJECT_ID.iam.gserviceaccount.com" \
+            --role="roles/cloudsql.client"
+          gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+            --member="serviceAccount:$BACKEND_SA@$PROJECT_ID.iam.gserviceaccount.com" \
+            --role="roles/secretmanager.secretAccessor"
+
+      - name: Deploy backend Cloud Run service
+        run: |
+          gcloud run deploy "$BACKEND_SERVICE" \
+            --source apps/backend \
+            --region "$REGION" \
+            --project "$PROJECT_ID" \
+            --service-account "$BACKEND_SA@$PROJECT_ID.iam.gserviceaccount.com" \
+            --add-cloudsql-instances "$INSTANCE_CONNECTION_NAME" \
+            --allow-unauthenticated \
+            --set-env-vars "POSTGRES_HOST=/cloudsql/$INSTANCE_CONNECTION_NAME,POSTGRES_PORT=5432,POSTGRES_DB=$DB_NAME,POSTGRES_USER=$DB_USER,POSTGRES_CONNECT_TIMEOUT=5,LOG_LEVEL=INFO" \
+            --set-secrets "POSTGRES_PASSWORD=$DB_SECRET_NAME:latest"
+
+      - name: Read backend URL
+        id: backend_url
+        run: |
+          URL="$(gcloud run services describe "$BACKEND_SERVICE" --region "$REGION" --project "$PROJECT_ID" --format='value(status.url)')"
+          test -n "$URL" || (echo "Cannot read backend URL" && exit 1)
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Backend URL: $URL"
+
+      - name: Deploy frontend Cloud Run service
+        if: ${{ inputs.deploy_frontend }}
+        run: |
+          gcloud run deploy "$FRONTEND_SERVICE" \
+            --source apps/frontend \
+            --region "$REGION" \
+            --project "$PROJECT_ID" \
+            --service-account "$FRONTEND_SA@$PROJECT_ID.iam.gserviceaccount.com" \
+            --allow-unauthenticated \
+            --set-env-vars "BACKEND_URL=${{ steps.backend_url.outputs.url }}"
+
+      - name: Read frontend URL
+        if: ${{ inputs.deploy_frontend }}
+        run: |
+          URL="$(gcloud run services describe "$FRONTEND_SERVICE" --region "$REGION" --project "$PROJECT_ID" --format='value(status.url)')"
+          test -n "$URL" || (echo "Cannot read frontend URL" && exit 1)
+          echo "Frontend URL: $URL"

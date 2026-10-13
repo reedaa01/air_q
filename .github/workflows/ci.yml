@@ -6,6 +6,8 @@ on:
       - main
       - feature/**
     paths:
+      - apps/backend/**
+      - apps/frontend/**
       - etl/**
       - sql/**
       - requirements.txt
@@ -21,6 +23,8 @@ on:
     branches:
       - main
     paths:
+      - apps/backend/**
+      - apps/frontend/**
       - etl/**
       - sql/**
       - requirements.txt
@@ -40,7 +44,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  etl-test:
     name: Test ETL
     runs-on: ubuntu-latest
 
@@ -64,10 +68,62 @@ jobs:
       - name: Run ETL tests
         run: python test_open_meteo.py
 
+  backend-test:
+    name: Test Backend API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e "apps/backend.[test]"
+
+      - name: Run backend tests
+        run: pytest -q apps/backend/tests
+
+  frontend-quality:
+    name: Frontend Lint and Build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: apps/frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run frontend lint
+        run: npm run lint
+
+      - name: Build frontend
+        run: npm run build
+
   docker:
     name: Build Docker image
     runs-on: ubuntu-latest
-    needs: test
+    needs:
+      - etl-test
+      - backend-test
+      - frontend-quality
 
     steps:
       - name: Checkout repository
