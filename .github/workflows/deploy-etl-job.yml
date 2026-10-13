@@ -1,0 +1,119 @@
+name: Deploy ETL Cloud Run Job
+
+on:
+  workflow_dispatch:
+    inputs:
+      execute_now:
+        description: "Execute job immediately after deploy"
+        required: true
+        default: true
+        type: boolean
+      confirm_deploy:
+        description: "Type YES to confirm ETL deploy"
+        required: true
+        default: "NO"
+        type: string
+  push:
+    branches:
+      - main
+    paths:
+      - etl/**
+      - config.py
+      - requirements.txt
+      - Dockerfile.etl.cloud
+      - .github/workflows/deploy-etl-job.yml
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-etl-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-etl:
+    name: Build and Deploy ETL Job
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+      ETL_JOB_NAME: ${{ vars.GCP_ETL_JOB_NAME || 'air-q-etl-incremental' }}
+      ETL_SERVICE_ACCOUNT: ${{ vars.GCP_ETL_SERVICE_ACCOUNT || 'air-q-etl-sa' }}
+      INSTANCE_CONNECTION_NAME: ${{ vars.GCP_INSTANCE_CONNECTION_NAME }}
+      DB_SECRET_NAME: ${{ vars.GCP_DB_SECRET_NAME || 'air_q_db_password' }}
+      DB_NAME: ${{ vars.GCP_DB_NAME || 'air_quality_db' }}
+      DB_USER: ${{ vars.GCP_DB_USER || 'postgres' }}
+      AR_REPO: ${{ vars.GCP_ETL_AR_REPO || 'air-q-jobs' }}
+      AR_IMAGE: ${{ vars.GCP_ETL_IMAGE || 'air-q-etl' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate required variables
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            [[ "${{ inputs.confirm_deploy }}" == "YES" ]] || (echo "Deployment cancelled: set confirm_deploy to YES" && exit 1)
+          fi
+          test -n "$PROJECT_ID" || (echo "Missing repo variable GCP_PROJECT_ID" && exit 1)
+          test -n "$INSTANCE_CONNECTION_NAME" || (echo "Missing repo variable GCP_INSTANCE_CONNECTION_NAME" && exit 1)
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Setup gcloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure gcloud project
+        run: gcloud config set project "$PROJECT_ID"
+
+      - name: Validate ETL service account
+        run: |
+          gcloud iam service-accounts describe "$ETL_SERVICE_ACCOUNT@$PROJECT_ID.iam.gserviceaccount.com" --project "$PROJECT_ID" >/dev/null
+
+      - name: Ensure Artifact Registry repository exists
+        run: |
+          if ! gcloud artifacts repositories describe "$AR_REPO" --location "$REGION" --project "$PROJECT_ID" >/dev/null 2>&1; then
+            gcloud artifacts repositories create "$AR_REPO" \
+              --repository-format=docker \
+              --location "$REGION" \
+              --project "$PROJECT_ID" \
+              --description "Air Q Cloud Run Jobs images"
+          fi
+
+      - name: Build and push ETL image
+        run: |
+          IMAGE_URI="$REGION-docker.pkg.dev/$PROJECT_ID/$AR_REPO/$AR_IMAGE:${{ github.sha }}"
+          LATEST_URI="$REGION-docker.pkg.dev/$PROJECT_ID/$AR_REPO/$AR_IMAGE:latest"
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          docker build -f Dockerfile.etl.cloud -t "$IMAGE_URI" .
+          docker push "$IMAGE_URI"
+          gcloud artifacts docker tags add "$IMAGE_URI" "$LATEST_URI" --project "$PROJECT_ID"
+          echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
+        id: image
+
+      - name: Deploy Cloud Run ETL job
+        run: |
+          gcloud run jobs deploy "$ETL_JOB_NAME" \
+            --image "${{ steps.image.outputs.image_uri }}" \
+            --region "$REGION" \
+            --project "$PROJECT_ID" \
+            --service-account "$ETL_SERVICE_ACCOUNT@$PROJECT_ID.iam.gserviceaccount.com" \
+            --set-cloudsql-instances "$INSTANCE_CONNECTION_NAME" \
+            --max-retries 1 \
+            --tasks 1 \
+            --set-env-vars "POSTGRES_HOST=/cloudsql/$INSTANCE_CONNECTION_NAME,POSTGRES_PORT=5432,POSTGRES_DB=$DB_NAME,POSTGRES_USER=$DB_USER" \
+            --set-secrets "POSTGRES_PASSWORD=$DB_SECRET_NAME:latest"
+
+      - name: Execute ETL job now
+        if: ${{ github.event_name == 'push' || inputs.execute_now }}
+        run: |
+          gcloud run jobs execute "$ETL_JOB_NAME" \
+            --region "$REGION" \
+            --project "$PROJECT_ID" \
+            --wait
