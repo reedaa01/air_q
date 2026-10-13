@@ -21,6 +21,7 @@ jobs:
   deploy:
     name: Deploy Backend and Frontend
     runs-on: ubuntu-latest
+    environment: production
 
     env:
       PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
@@ -63,6 +64,16 @@ jobs:
         run: |
           gcloud iam service-accounts describe "$FRONTEND_SA@$PROJECT_ID.iam.gserviceaccount.com" --project "$PROJECT_ID" >/dev/null
 
+      - name: Snapshot current Cloud Run revisions
+        id: snapshot
+        run: |
+          BACKEND_PREV="$(gcloud run services describe "$BACKEND_SERVICE" --region "$REGION" --project "$PROJECT_ID" --format='value(status.latestReadyRevisionName)' || true)"
+          FRONTEND_PREV="$(gcloud run services describe "$FRONTEND_SERVICE" --region "$REGION" --project "$PROJECT_ID" --format='value(status.latestReadyRevisionName)' || true)"
+          echo "backend_prev=$BACKEND_PREV" >> "$GITHUB_OUTPUT"
+          echo "frontend_prev=$FRONTEND_PREV" >> "$GITHUB_OUTPUT"
+          echo "Previous backend revision: ${BACKEND_PREV:-none}"
+          echo "Previous frontend revision: ${FRONTEND_PREV:-none}"
+
       - name: Deploy backend Cloud Run service
         run: |
           gcloud run deploy "$BACKEND_SERVICE" \
@@ -96,8 +107,67 @@ jobs:
             --set-env-vars "BACKEND_URL=${{ steps.backend_url.outputs.url }}"
 
       - name: Read frontend URL
+        id: frontend_url
         if: ${{ inputs.deploy_frontend }}
         run: |
           URL="$(gcloud run services describe "$FRONTEND_SERVICE" --region "$REGION" --project "$PROJECT_ID" --format='value(status.url)')"
           test -n "$URL" || (echo "Cannot read frontend URL" && exit 1)
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Frontend URL: $URL"
+
+      - name: Post-deploy health checks
+        run: |
+          set -euo pipefail
+
+          retry_url() {
+            local url="$1"
+            local expected="$2"
+            local attempts=10
+            local sleep_seconds=8
+            local body=""
+
+            for attempt in $(seq 1 $attempts); do
+              body="$(curl -sS "$url" || true)"
+              if [[ "$body" == *"$expected"* ]]; then
+                echo "Health check OK: $url"
+                return 0
+              fi
+              echo "Attempt $attempt/$attempts failed for $url"
+              sleep "$sleep_seconds"
+            done
+
+            echo "Health check failed for $url"
+            echo "$body"
+            return 1
+          }
+
+          retry_url "${{ steps.backend_url.outputs.url }}/health/ready" '"status":"ok"'
+
+          if [[ "${{ inputs.deploy_frontend }}" == "true" ]]; then
+            retry_url "${{ steps.frontend_url.outputs.url }}/api/v1/air-quality/latest" '"data"'
+          fi
+
+      - name: Roll back to previous revisions on failure
+        if: ${{ failure() }}
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${{ steps.snapshot.outputs.backend_prev }}" ]]; then
+            gcloud run services update-traffic "$BACKEND_SERVICE" \
+              --region "$REGION" \
+              --project "$PROJECT_ID" \
+              --to-revisions "${{ steps.snapshot.outputs.backend_prev }}=100"
+            echo "Rolled back backend to ${{ steps.snapshot.outputs.backend_prev }}"
+          else
+            echo "No previous backend revision found; skipping backend rollback"
+          fi
+
+          if [[ "${{ inputs.deploy_frontend }}" == "true" && -n "${{ steps.snapshot.outputs.frontend_prev }}" ]]; then
+            gcloud run services update-traffic "$FRONTEND_SERVICE" \
+              --region "$REGION" \
+              --project "$PROJECT_ID" \
+              --to-revisions "${{ steps.snapshot.outputs.frontend_prev }}=100"
+            echo "Rolled back frontend to ${{ steps.snapshot.outputs.frontend_prev }}"
+          else
+            echo "No frontend rollback needed"
+          fi
