@@ -55,26 +55,13 @@ jobs:
       - name: Configure gcloud project
         run: gcloud config set project "$PROJECT_ID"
 
-      - name: Ensure backend service account exists
+      - name: Validate backend service account
         run: |
-          if ! gcloud iam service-accounts describe "$BACKEND_SA@$PROJECT_ID.iam.gserviceaccount.com" --project "$PROJECT_ID" >/dev/null 2>&1; then
-            gcloud iam service-accounts create "$BACKEND_SA" --display-name="Air Q backend service account" --project "$PROJECT_ID"
-          fi
+          gcloud iam service-accounts describe "$BACKEND_SA@$PROJECT_ID.iam.gserviceaccount.com" --project "$PROJECT_ID" >/dev/null
 
-      - name: Ensure frontend service account exists
+      - name: Validate frontend service account
         run: |
-          if ! gcloud iam service-accounts describe "$FRONTEND_SA@$PROJECT_ID.iam.gserviceaccount.com" --project "$PROJECT_ID" >/dev/null 2>&1; then
-            gcloud iam service-accounts create "$FRONTEND_SA" --display-name="Air Q frontend service account" --project "$PROJECT_ID"
-          fi
-
-      - name: Grant backend Cloud SQL and secret access
-        run: |
-          gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-            --member="serviceAccount:$BACKEND_SA@$PROJECT_ID.iam.gserviceaccount.com" \
-            --role="roles/cloudsql.client"
-          gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-            --member="serviceAccount:$BACKEND_SA@$PROJECT_ID.iam.gserviceaccount.com" \
-            --role="roles/secretmanager.secretAccessor"
+          gcloud iam service-accounts describe "$FRONTEND_SA@$PROJECT_ID.iam.gserviceaccount.com" --project "$PROJECT_ID" >/dev/null
 
       - name: Deploy backend Cloud Run service
         run: |
